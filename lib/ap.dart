@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:hackcog/recdet.dart';
 import 'package:http/http.dart' as http;
 
 class RecipeGenerator extends StatefulWidget {
@@ -60,72 +61,92 @@ class _RecipeGeneratorState extends State<RecipeGenerator> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text('Recipe Generator'),
-      // ),
-      body: Container(
-        margin: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height*0.05),
-        child: Column(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        // color: Colors.black,
-                        borderRadius: BorderRadius.horizontal( right: Radius.circular(40),left: Radius.circular(40))
+      appBar: AppBar(
+        title: Text('Recipe Generator'),
+      ),
+      body: Column(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: TextField(
+                    controller: _ingredientController,
+                    decoration: InputDecoration(
+                      hintText: 'Add your ingredients here',
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: addFilter,
+                ),
+                IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: searchRecipes,
+                ),
+              ],
+            ),
+          ),
+          Container(
+            height: 50,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: filters.length,
+              itemBuilder: (context, index) {
+                return Chip(
+                  label: Text(filters[index]),
+                  onDeleted: () => deleteFilter(index),
+                );
+              },
+            ),
+          ),
+          isLoading
+              ? Center(child: CircularProgressIndicator())
+              : Expanded(
+            child: GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, // Two items per row
+                childAspectRatio: 0.7, // Aspect ratio for each card
+              ),
+              itemCount: recipes.length,
+              itemBuilder: (context, index) {
+                final recipe = recipes[index]['recipe'];
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RecipeDetailsScreen(recipe: recipe),
                       ),
-                      child: TextField(
-                        controller: _ingredientController,
-                        decoration: InputDecoration(
-                          hintText: 'Add your ingredients here',
-                        ),
+                    );
+                  },
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width*0.01,vertical: MediaQuery.of(context).size.height*0.01),
+                    child: Card(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(17))),
+                      elevation: 4, // Adjust the elevation as needed
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          ClipRRect(
+                          borderRadius:  BorderRadius.only(topRight: Radius.circular(17)),
+                              child: Image.network(recipe['image'])),
+                          Text(
+                            recipe['label'],
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(recipe['source']),
+                        ],
                       ),
                     ),
                   ),
-                  IconButton(
-                    icon: Icon(Icons.add),
-                    onPressed: addFilter,
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.search),
-                    onPressed: searchRecipes,
-                  ),
-                ],
-              ),
+                );
+              },
             ),
-            Container(
-              height: 50,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: filters.length,
-                itemBuilder: (context, index) {
-                  return Chip(
-                    label: Text(filters[index]),
-                    onDeleted: () => deleteFilter(index),
-                  );
-                },
-              ),
-            ),
-            isLoading
-                ? Center(child: CircularProgressIndicator())
-                : Expanded(
-              child: ListView.builder(
-                itemCount: recipes.length,
-                itemBuilder: (context, index) {
-                  final recipe = recipes[index]['recipe'];
-                  return ListTile(
-                    title: Text(recipe['label']),
-                    subtitle: Text(recipe['source']),
-                    // You can display more information about the recipe here
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
