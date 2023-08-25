@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hackcog/recdet.dart';
 import 'package:http/http.dart' as http;
 
 class RecipeGenerator extends StatefulWidget {
+
+
   @override
   _RecipeGeneratorState createState() => _RecipeGeneratorState();
 }
@@ -13,6 +16,15 @@ class _RecipeGeneratorState extends State<RecipeGenerator> {
   List<String> filters = [];
   List<dynamic> recipes = [];
   bool isLoading = false;
+  List<String> initialIngredients = [
+    'lemon', 'tea', 'chicken', 'tomato', 'potato', 'onion', 'garlic', 'carrot',
+    'broccoli', 'spinach', 'pasta', 'rice', 'beans', 'cheese', 'egg', 'bread',
+    'avocado', 'banana', 'strawberry', 'blueberry', 'mushroom', 'bell pepper',
+    'cucumber', 'zucchini', 'pineapple', 'orange', 'grapefruit', 'watermelon',
+    'chocolate', 'yogurt', 'honey', 'nuts', 'cereal', 'oatmeal', 'quinoa'
+
+  ];
+
 
   void addFilter() {
     String ingredient = _ingredientController.text.trim();
@@ -22,6 +34,21 @@ class _RecipeGeneratorState extends State<RecipeGenerator> {
         _ingredientController.clear();
       });
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Select a random ingredient from initialIngredients list
+    final random = Random();
+    final randomIngredientIndex = random.nextInt(initialIngredients.length);
+    final initialIngredient = initialIngredients[randomIngredientIndex];
+
+    // Add the random ingredient to filters
+    filters.add(initialIngredient);
+
+    // Trigger searchRecipes to populate recipes with initial search
+    searchRecipes();
   }
 
   void deleteFilter(int index) {
@@ -35,11 +62,12 @@ class _RecipeGeneratorState extends State<RecipeGenerator> {
       isLoading = true;
     });
 
-    final app_id = 'beb1aeae'; // Replace with your Edamam app ID
-    final app_key = '8c653798159b10ffea8beb0bd541a0c0'; // Replace with your Edamam app key
+    final app_id = 'beb1aeae';
+    final app_key = '8c653798159b10ffea8beb0bd541a0c0';
     final query = filters.join(' ');
 
-    final Uri url = Uri.parse('https://api.edamam.com/search?q=$query&app_id=$app_id&app_key=$app_key');
+    final Uri url = Uri.parse(
+        'https://api.edamam.com/search?q=$query&app_id=$app_id&app_key=$app_key');
     final response = await http.get(url);
 
 
@@ -61,43 +89,155 @@ class _RecipeGeneratorState extends State<RecipeGenerator> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Recipe Generator'),
-      ),
+
+
       body: Column(
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: TextField(
-                    controller: _ingredientController,
-                    decoration: InputDecoration(
-                      hintText: 'Add your ingredients here',
-                    ),
+
+
+          Container(
+            height: MediaQuery
+                .of(context)
+                .size
+                .height * 0.25,
+            width: MediaQuery
+                .of(context)
+                .size
+                .width,
+            decoration: BoxDecoration(
+              color: Color(0xFFF262627),
+              borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30)),
+
+            ),
+
+            child: Column(
+              children: [
+
+                Row(
+                  children: [
+                    Container(
+                        margin: EdgeInsets.only(left: MediaQuery
+                            .of(context)
+                            .size
+                            .width * 0.04, top: MediaQuery
+                            .of(context)
+                            .size
+                            .height * 0.077),
+                        child: Text('CineCook~', style: TextStyle(
+                            color: Colors.white, fontSize: MediaQuery
+                            .of(context)
+                            .size
+                            .height * 0.035, fontWeight: FontWeight.w600),)),
+                    Container(
+                        height: 35,
+
+                        // padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.005,vertical: MediaQuery.of(context).size.height * 0.0001),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          color: Color(0xFFFCCFF00),
+
+                        ),
+
+
+                        margin: EdgeInsets.only(left: MediaQuery
+                            .of(context)
+                            .size
+                            .width * 0.4, top: MediaQuery
+                            .of(context)
+                            .size
+                            .height * 0.077),
+                        child: IconButton(onPressed: () {},
+                            icon: Icon(
+                              Icons.favorite_border, color: Colors.black,)))
+                  ],
+                ),
+
+
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFF393939),
+                    borderRadius: BorderRadius.circular(15),
+
                   ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.add),
-                  onPressed: addFilter,
-                ),
-                IconButton(
-                  icon: Icon(Icons.search),
-                  onPressed: searchRecipes,
-                ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 14),
+                          child: TextField(
+
+                            style: TextStyle(color: Colors.white),
+
+                            controller: _ingredientController,
+                            decoration: InputDecoration(
+
+
+                              hintText: 'Add your ingredients here',
+                              hintStyle: TextStyle(color: Colors.grey,),
+
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.add, color: Colors.grey,),
+                        onPressed: addFilter,
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.search, color: Colors.grey,),
+                        onPressed: searchRecipes,
+                      ),
+                    ],
+                  ),
+                )
+
+
               ],
             ),
           ),
+
+
           Container(
-            height: 50,
+
+            margin: EdgeInsets.only(top: MediaQuery
+                .of(context)
+                .size
+                .height * 0.02, left: MediaQuery
+                .of(context)
+                .size
+                .width * 0.04, right: MediaQuery
+                .of(context)
+                .size
+                .width * 0.02, bottom: MediaQuery
+                .of(context)
+                .size
+                .height * 0.02),
+            // padding: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.02,left:MediaQuery.of(context).size.width*0.04 ),
+
+            height: 30,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: filters.length,
               itemBuilder: (context, index) {
-                return Chip(
-                  label: Text(filters[index]),
-                  onDeleted: () => deleteFilter(index),
+                return Container(
+                  margin: EdgeInsets.only(left: MediaQuery
+                      .of(context)
+                      .size
+                      .width * 0.02, right: MediaQuery
+                      .of(context)
+                      .size
+                      .width * 0.01),
+
+                  child: Chip(
+                    backgroundColor: Color(0xFFF393939),
+                    label: Text(
+                      filters[index], style: TextStyle(color: Colors.grey),),
+                    deleteIconColor: Colors.grey,
+                    onDeleted: () => deleteFilter(index),
+                  ),
                 );
               },
             ),
@@ -118,26 +258,50 @@ class _RecipeGeneratorState extends State<RecipeGenerator> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => RecipeDetailsScreen(recipe: recipe),
+                        builder: (context) =>
+                            RecipeDetailsScreen(recipe: recipe),
                       ),
                     );
                   },
                   child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width*0.01,vertical: MediaQuery.of(context).size.height*0.01),
+
+
+                    margin: EdgeInsets.symmetric(horizontal: MediaQuery
+                        .of(context)
+                        .size
+                        .width * 0.01, vertical: MediaQuery
+                        .of(context)
+                        .size
+                        .height * 0.005),
                     child: Card(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(17))),
-                      elevation: 4, // Adjust the elevation as needed
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(17))),
+                      elevation: 2,
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           ClipRRect(
-                          borderRadius:  BorderRadius.only(topRight: Radius.circular(17)),
-                              child: Image.network(recipe['image'])),
-                          Text(
-                            recipe['label'],
-                            style: TextStyle(fontWeight: FontWeight.bold),
+
+                              borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(30)),
+
+
+                              child: Container(
+                                // padding: EdgeInsets.all(10),
+
+                                  child: Image.network(recipe['image'],),),),
+
+                          SizedBox(height: 15,),
+                          Center(
+                            child: Text(
+                              recipe['label'],
+                              overflow: TextOverflow.fade,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
                           ),
-                          Text(recipe['source']),
+                          SizedBox(height: 5,),
+                          Text(recipe['source'],overflow: TextOverflow.fade,),
                         ],
                       ),
                     ),
