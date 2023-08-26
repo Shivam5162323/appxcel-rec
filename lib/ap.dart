@@ -290,18 +290,36 @@ class _RecipeGeneratorState extends State<RecipeGenerator> {
                               child: Container(
                                 // padding: EdgeInsets.all(10),
 
-                                  child: Image.network(recipe['image'],),),),
+                                  child: Image.network(recipe['image'],
+
+                                      errorBuilder: (context, error, stackTrace) {
+
+                                        return Container(
+                                            margin: EdgeInsets.symmetric(vertical: 25),
+                                            child: Image.network('https://cdn-icons-png.flaticon.com/128/11520/11520781.png'));
+                                      }
+                                  ),),),
 
                           SizedBox(height: 15,),
                           Center(
-                            child: Text(
-                              recipe['label'],
-                              overflow: TextOverflow.fade,
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            child: Column(
+                              children: [
+                                Text(
+                                  recipe['label'],
+                                  maxLines: 1, // Limit to one line
+                                  overflow: TextOverflow.ellipsis, // Use ellipsis for overflow
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(height: 5,),
+                                Text(
+                                  recipe['source'],
+                                  maxLines: 1, // Limit to one line
+                                  overflow: TextOverflow.ellipsis, // Use ellipsis for overflow
+                                ),
+                              ],
                             ),
-                          ),
-                          SizedBox(height: 5,),
-                          Text(recipe['source'],overflow: TextOverflow.fade,),
+                          )
+
                         ],
                       ),
                     ),

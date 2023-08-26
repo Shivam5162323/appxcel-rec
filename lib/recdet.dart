@@ -1,8 +1,8 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:html/parser.dart' as html;
 
 class RecipeDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> recipe;
@@ -14,157 +14,397 @@ class RecipeDetailsScreen extends StatefulWidget {
 }
 
 class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
-  Map<String, dynamic> chatResponse = {};
-  String recipeSteps = 'Loading...'; // Placeholder for recipe steps
+  List<String> movieTitles = [];
+  List<String> movieImageUrls = [];
+  String genres = 'comedy';
 
-  @override
-  void initState() {
-    super.initState();
-    _searchRecipeDetails();
-  }
+  void fetchData(String genre) async {
+    final url = 'https://moviesmod.vip/movies-by-genre/$genre/';
 
+    // Send an HTTP GET request to the URL
+    final response = await http.get(Uri.parse(url));
 
-
-  Future<void> _searchRecipeDetails() async {
-    final label = widget.recipe['label'];
-    final apiKey = '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'; // Replace with your OpenAI API key
-
-    final response = await http.post(
-      Uri.parse('https://api.openai.com/v1/engines/davinci-codex/completions'),
-      headers: {
-        'Authorization': 'Bearer $apiKey',
-      },
-      body: json.encode({
-        'query': 'Find a recipe for $label in less than 10 steps',
-        'max_tokens': 100, // Increase max_tokens for longer responses
-      }),
-    );
-
+    // Check if the request was successful (status code 200)
     if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
-      print('ChatGPT Response: $responseData');
+      // Parse the HTML content of the webpage
+      final document = html.parse(response.body);
 
-      setState(() {
-        chatResponse = responseData;
-      });
+      // Extract movie titles
+      final titles = document.querySelectorAll('.front-view-title');
+      for (final title in titles) {
+        final extractedTitle = extractTitle(title.text);
+        if (extractedTitle != null) {
+          // Check if the widget is still mounted before calling setState
+          if (mounted) {
+            setState(() {
+              movieTitles.add(extractedTitle);
+            });
+          }
+        }
+      }
 
-      // Now, make another API call to retrieve the recipe steps
-      final recipeStepsResponse = await http.get(
-        Uri.parse('URL_TO_RETRIEVE_RECIPE_STEPS'), // Replace with the actual URL for retrieving steps
-      );
+      // Extract movie image URLs
+      final images = document.querySelectorAll('.featured-thumbnail img');
+      for (final image in images) {
+        final imageUrl = image.attributes['src'] ?? '';
+        // Check if the widget is still mounted before calling setState
+        if (mounted) {
+          setState(() {
+            movieImageUrls.add(imageUrl);
+          });
+        }
+      }
 
-      if (recipeStepsResponse.statusCode == 200) {
-        final recipeStepsData = json.decode(recipeStepsResponse.body);
-        // Extract and handle the recipe steps here
-        setState(() {
-          recipeSteps = '1. Step 1\n2. Step 2\n3. Step 3'; // Replace with actual steps
-        });
-      } else {
-        print('Recipe Steps API Request Failed: ${recipeStepsResponse.statusCode}');
-        setState(() {
-          recipeSteps = 'Failed to retrieve recipe steps.';
-        });
+      // Genre checking based on dish ingredients
+      final dishIngredients = widget.recipe['ingredients'];
+      if (dishIngredients != null && dishIngredients is Iterable) {
+        for (var ingredient in dishIngredients) {
+          final ingredientText = ingredient['text'].toLowerCase();
+
+          if (ingredientText.contains('sugar') ||
+              ingredientText.contains('honey') ||
+              ingredientText.contains('sweet')) {
+            genres = 'romance';
+          } else if (ingredientText.contains('chili') ||
+              ingredientText.contains('pepper')) {
+            genres = 'action';
+          } else if (ingredientText.contains('spice') ||
+              ingredientText.contains('turmeric')) {
+            genres = 'adventure';
+          } else if (ingredientText.contains('onion')) {
+            genres = 'thriller';
+          } else {
+            genres = 'horror';
+          }
+        }
       }
     } else {
-      print('ChatGPT API Request Failed: ${response.statusCode}');
+      // Handle the case when the request fails
+      print('Failed to fetch data. Status code: ${response.statusCode}');
     }
   }
 
+  String? extractTitle(String text) {
+    // Split the text at each "Download" occurrence
+    final parts = text.split("Download");
+
+    // Check if there are at least two parts
+    if (parts.length >= 2) {
+      // Trim and get the second part, which contains the title
+      final title = parts[1].trim();
+
+      // Find the first occurrence of a year in parentheses
+      final yearMatch = RegExp(r'\(\d{4}\)').firstMatch(title);
+
+      if (yearMatch != null) {
+        // Remove the text after the year
+        final cleanedTitle = title.substring(0, yearMatch.start).trim();
+        return cleanedTitle;
+      } else {
+        // If no year is found, return the original title
+        return title;
+      }
+    } else {
+      print("Invalid format: $text");
+      return null;
+    }
+  }
+  late String tle;
+  @override
+  void initState() {
+    super.initState();
+    tle = widget.recipe['label'];
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
+    fetchData(genres);
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Stack(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.2,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(30),
-                      bottomRight: Radius.circular(30),
+        backgroundColor: Colors.white,
+        body: SingleChildScrollView(
+          child: Stack(
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+
+                children: [
+                  Container(
+                    height: MediaQuery
+                        .of(context)
+                        .size
+                        .height * 0.25,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: MediaQuery
+                              .of(context)
+                              .size
+                              .height * 0.34,
+                          margin: EdgeInsets.only(
+                            left: MediaQuery
+                                .of(context)
+                                .size
+                                .width * 0.04,
+                            top: tle.length>30?MediaQuery
+                                .of(context)
+                                .size
+                                .height * 0.05:MediaQuery
+                                .of(context)
+                                .size
+                                .height * 0.08,),
+                          child: Text(
+                            widget.recipe['label'],
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize:
+                                MediaQuery
+                                    .of(context)
+                                    .size
+                                    .height * 0.025,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        Container(
+                            height: 35,
+
+                            // padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.005,vertical: MediaQuery.of(context).size.height * 0.0001),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4),
+                              color: Color(0xFFFCCFF00),
+                            ),
+                            margin: EdgeInsets.only(
+                              left: MediaQuery
+                                  .of(context)
+                                  .size
+                                  .width * 0.04,
+                              right:MediaQuery
+                                  .of(context)
+                                  .size
+                                  .width * 0.03 ,
+                              top: tle.length>30?MediaQuery
+                                  .of(context)
+                                  .size
+                                  .height * 0.05:MediaQuery
+                                  .of(context)
+                                  .size
+                                  .height * 0.08,
+
+                            ),
+                            child: IconButton(
+                                onPressed: () {},
+                                icon: Icon(
+                                  Icons.favorite_border,
+                                  color: Colors.black,
+                                )))
+                      ],
                     ),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.13),
-                  alignment: Alignment.center,
-                  child: Text(
-                    widget.recipe['label'],
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    'Ingredients:',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                // Display the ingredients only if they exist and are iterable
-                if (widget.recipe['ingredients'] != null && widget.recipe['ingredients'] is Iterable)
-                  for (var ingredient in widget.recipe['ingredients'])
-                    Container(
-                      margin: EdgeInsets.symmetric(vertical: 7, horizontal: 13),
-                      child: ListTile(
-                        tileColor: Color(0xFFF262627),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(17)),
-                        title: Text('${ingredient['text']}', style: TextStyle(color: Color(0xFFFF4F4EC))),
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(30),
+                        bottomRight: Radius.circular(30),
                       ),
                     ),
-
-
-                SizedBox(height: 16),
-
-
-
-
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    'Recipe Steps:',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
+
+
+                  Container(
+                    margin: EdgeInsets.only(top: MediaQuery
+                        .of(context)
+                        .size
+                        .height * 0.155, left: MediaQuery
+                        .of(context)
+                        .size
+                        .width * 0.04),
+                    padding: const EdgeInsets.all(10.0),
+                    child: Text(
+                      'Ingredients:',
+                      style: TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+
+
+                  if (widget.recipe['ingredients'] != null &&
+                      widget.recipe['ingredients'] is Iterable)
+                    for (var ingredient in widget.recipe['ingredients'])
+                      Container(
+                        margin: EdgeInsets.symmetric(
+                            vertical: 7, horizontal: 13),
+                        child: ListTile(
+                          tileColor: Color(0xFFF262627),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(17)),
+                          title: Text('${ingredient['text']}',
+                              style: TextStyle(color: Color(0xFFFF4F4EC))),
+                        ),
+                      ),
+
+
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Text(
+                      'Recipe link:',
+                      style: TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  // Display the recipe steps here
+                  Container(
+                    margin: EdgeInsets.only(right: 16,left: 16,top: 16,bottom: MediaQuery.of(context).size.height*0.1),
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Color(0xFFF262627),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: TextButton(
+                      child: Text(
+                        '${widget.recipe['url']}',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      onPressed: () {
+                        launchUrlString(widget.recipe['url'],
+                            mode: LaunchMode.inAppWebView);
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                ],
+              ),
+
+
+              Container(
+                alignment: Alignment.center,
+                margin: EdgeInsets.only(
+                  top: MediaQuery
+                      .of(context)
+                      .size
+                      .height * 0.15,
                 ),
-                // Display the recipe steps here
-                Container(
-                  margin: EdgeInsets.all(16),
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: TextButton(
-                    child: Text('${widget.recipe['url']}',style: TextStyle(fontSize: 16),),
-                    onPressed: (){
-                     launchUrlString(widget.recipe['url'],mode: LaunchMode.inAppWebView);
-                    },
+                child: Center(
+                  child: Container(
 
-                  ),
-                ),
-                SizedBox(height: 16),
-              ],
-            ),
+                    padding: EdgeInsets.all(MediaQuery
+                        .of(context)
+                        .size
+                        .width * 0.014),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(420),),
+                      border: Border.fromBorderSide(BorderSide(
+                          strokeAlign: 1.2, color: Colors.grey, width: 5)),
+                      color: Colors.black,
 
-            Container(
-              margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.1),
-              child: Center(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.all(Radius.circular(400)),
-                  child: Image.network(
-                    widget.recipe['image'],
-                    height: MediaQuery.of(context).size.height * 0.2,
+
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(400)),
+
+                      child: Image.network(
+                        widget.recipe['image'],
+                        height: MediaQuery
+                            .of(context)
+                            .size
+                            .height * 0.23,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                              padding: EdgeInsets.all(15),
+                              decoration: BoxDecoration(
+                                  color: Colors.pinkAccent,
+                                  borderRadius:
+                                  BorderRadius.all(Radius.circular(10))),
+                              margin: EdgeInsets.symmetric(vertical: 25),
+                              child: CircleAvatar(
+
+
+                                foregroundColor: Colors.grey,
+                                child: Image.network(
+                                    'https://cdn-icons-png.flaticon.com/128/11520/11520781.png'),
+                                backgroundColor: Colors.grey,
+                              ));
+                        },
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
+        bottomSheet: Container(
+          height: 70,
+          width: double.infinity,
+          child: Builder(
+            builder: (BuildContext context) {
+              return GestureDetector(
+                onTap: () {
+                  showModalBottomSheet(
+
+                    backgroundColor: Colors.transparent,
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(topLeft: Radius.circular(23),topRight: Radius.circular(23)),border: Border.all(color: Colors.yellow)),
+                        padding: EdgeInsets.symmetric(vertical: 13),
+                        child: Column(
+                          children: [
+                            Text(
+                              'Recommended Movies',
+                              style: TextStyle(
+                                  fontSize: 24, fontWeight: FontWeight.bold),
+                            ),
+                            Expanded(
+                              child: ListView.builder(
+
+                                itemCount: 10,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Container(
+                                    margin: EdgeInsets.symmetric(vertical: 3),
+                                    child: ListTile(
+
+                                      title: Text(movieTitles[index]),
+                                      leading: ClipRRect(
+                                        borderRadius: BorderRadius.circular(77),
+                                        child: Image.network(
+                                            movieImageUrls[index],  errorBuilder: (context, error, stackTrace) {
+
+                                          return Container(
+                                              // margin: EdgeInsets.symmetric(vertical: 25),
+                                              child: Image.network('https://cdn-icons-png.flaticon.com/128/777/777242.png'));
+                                        }),
+                                      ), // Show movie image here
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(17),
+                          topLeft: Radius.circular(17))),
+                  child: Center(
+                    child: Icon(
+                      Icons.arrow_upward,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        )
     );
   }
 }
