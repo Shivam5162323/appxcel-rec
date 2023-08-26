@@ -1,17 +1,20 @@
-# hackcog
+# CineCook
 
-A new Flutter project.
 
-## Getting Started
+## About
 
-This project is a starting point for a Flutter application.
+Introducing "Cine Cook" with AI-powered recipe search. Find recipes with whatever you have at home! Cook up magic with ingredients on hand and enjoy movie suggestions to match. A culinary adventure like never before! 🍳🔍🎥 #CineCook
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## APK LINK
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-"# appxcel-rec" 
+https://drive.google.com/file/d/1I3vNV6rx3eGwjvV6j4xMnc_d7u85ft28/view?usp=sharing
+
+## CODE ZIP
+
+https://drive.google.com/file/d/1uhBvaJff2XKVUfBUpVOPQv-78McAAHWg/view?usp=sharing
+
+## IMAGES LINK
+
+https://drive.google.com/file/d/1ObE5nAs-w2SgJ6yDy8O_wyfs6i-m4qtR/view?usp=sharing
+
