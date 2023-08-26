@@ -8,7 +8,7 @@ Introducing "Cine Cook" with AI-powered recipe search. Find recipes with whateve
 
 ## APK LINK
 
-https://drive.google.com/file/d/1I3vNV6rx3eGwjvV6j4xMnc_d7u85ft28/view?usp=sharing
+https://drive.google.com/file/d/1hFdTg7_gMrThFxEP_sGHdUkg3x7BY_IY/view?usp=sharing
 
 ## CODE ZIP
 
