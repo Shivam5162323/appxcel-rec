@@ -168,7 +168,7 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                           ),
                         ),
                         Container(
-                            height: 35,
+                            // height: 35,
 
                             // padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.005,vertical: MediaQuery.of(context).size.height * 0.0001),
                             decoration: BoxDecoration(
@@ -333,78 +333,74 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
             ],
           ),
         ),
-        bottomSheet: Container(
-          height: 70,
-          width: double.infinity,
-          child: Builder(
-            builder: (BuildContext context) {
-              return GestureDetector(
-                onTap: () {
-                  showModalBottomSheet(
+        floatingActionButton: SizedBox(
+          height: MediaQuery.of(context).size.width*0.185,
+          width: MediaQuery.of(context).size.width*0.185,
+          child: FloatingActionButton(
+            elevation: 6,
 
-                    backgroundColor: Colors.transparent,
-                    context: context,
-                    builder: (BuildContext context) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(topLeft: Radius.circular(23),topRight: Radius.circular(23)),border: Border.all(color: Colors.yellow)),
-                        padding: EdgeInsets.symmetric(vertical: 13),
-                        child: Column(
-                          children: [
-                            Text(
-                              'Recommended Movies',
-                              style: TextStyle(
-                                  fontSize: 24, fontWeight: FontWeight.bold),
-                            ),
-                            Expanded(
-                              child: ListView.builder(
 
-                                itemCount: 10,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Container(
-                                    margin: EdgeInsets.symmetric(vertical: 3),
-                                    child: ListTile(
+            backgroundColor: Colors.black,
+            child: Icon(Icons.movie_filter_outlined,color: Colors.white,),
+            shape: StadiumBorder(
 
-                                      title: Text(movieTitles[index]),
-                                      leading: ClipRRect(
-                                        borderRadius: BorderRadius.circular(77),
-                                        child: Image.network(
-                                            movieImageUrls[index],  errorBuilder: (context, error, stackTrace) {
+              side: BorderSide(color: Colors.grey, width: 2.0),
+            ),
+            onPressed: (){
+              showModalBottomSheet(
 
-                                          return Container(
-                                              // margin: EdgeInsets.symmetric(vertical: 25),
-                                              child: Image.network('https://cdn-icons-png.flaticon.com/128/777/777242.png'));
-                                        }),
-                                      ), // Show movie image here
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
+
+                backgroundColor: Colors.transparent,
+                context: context,
+                builder: (BuildContext context) {
+                  return Container(
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(topLeft: Radius.circular(23),topRight: Radius.circular(23),),border: Border.all(color: Colors.black)),
+                    padding: EdgeInsets.symmetric(vertical: 13),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Recommended Movies',
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
                         ),
-                      );
-                    },
+                        Expanded(
+                          child: ListView.builder(
+
+                            itemCount: 10,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Container(
+                                color: Colors.white,
+
+                                margin: EdgeInsets.symmetric(vertical: 3),
+                                child: ListTile(
+
+                                  title: Text(movieTitles[index]),
+                                  leading: ClipRRect(
+                                    borderRadius: BorderRadius.circular(77),
+                                    child: Image.network(
+                                        movieImageUrls[index],  errorBuilder: (context, error, stackTrace) {
+
+                                      return Container(
+                                        // margin: EdgeInsets.symmetric(vertical: 25),
+                                          child: Image.network('https://cdn-icons-png.flaticon.com/128/777/777242.png'));
+                                    }),
+                                  ), // Show movie image here
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   );
                 },
-                child: Container(
-                  decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(17),
-                          topLeft: Radius.circular(17))),
-                  child: Center(
-                    child: Icon(
-                      Icons.arrow_upward,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
               );
             },
           ),
-        )
+        ),
+
     );
   }
 }

@@ -89,7 +89,7 @@ class _RecipeGeneratorState extends State<RecipeGenerator> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
+backgroundColor:  Color(0xFFFFFFFFF),
 
       body: Column(
         children: <Widget>[
@@ -274,9 +274,11 @@ class _RecipeGeneratorState extends State<RecipeGenerator> {
                         .size
                         .height * 0.005),
                     child: Card(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(17))),
-                      elevation: 2,
+                      color: Color(0xFFFFFFFFF),
+                shape: RoundedRectangleBorder(
+                borderRadius:
+                BorderRadius.only(topRight: Radius.circular(30),bottomRight: Radius.circular(17),bottomLeft: Radius.circular(17))),
+                elevation: 2,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
