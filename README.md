@@ -12,7 +12,7 @@ https://drive.google.com/file/d/1hFdTg7_gMrThFxEP_sGHdUkg3x7BY_IY/view?usp=shari
 https://drive.google.com/drive/folders/10yA3g2spNAu7SVDHQllutK0jaSOPbknL
 
 
-![alt text style="width:20px; height:40px"](https://github.com/Shivam5162323/appxcel-rec/blob/main/assets/images/WhatsApp%20Image%202023-08-26%20at%202.40.40%20AM.jpeg?raw=true)
+![alt text style="width:20px; height:40px"](https://github.com/Shivam5162323/appxcel-rec/blob/main/assets/images/WhatsApp%20Image%202023-08-26%20at%202.40.40%20AM.jpeg?raw=true){:height="100px" width="100px"}
 
 ![alt text style="width:20px; height:40px"](https://github.com/Shivam5162323/appxcel-rec/blob/main/assets/images/WhatsApp%20Image%202023-08-26%20at%207.53.21%20AM.jpeg?raw=true)
 
