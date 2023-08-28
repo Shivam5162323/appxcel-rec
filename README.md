@@ -23,4 +23,4 @@ https://drive.google.com/file/d/1ObE5nAs-w2SgJ6yDy8O_wyfs6i-m4qtR/view?usp=shari
 https://drive.google.com/drive/folders/10yA3g2spNAu7SVDHQllutK0jaSOPbknL
 
 
-![alt text](https://github.com/Shivam5162323/appxcel-rec/blob/main/assets/images/WhatsApp%20Image%202023-08-26%20at%202.40.40%20AM.jpeg?raw=true)
+![alt text style="width:200px; height:200px"](https://github.com/Shivam5162323/appxcel-rec/blob/main/assets/images/WhatsApp%20Image%202023-08-26%20at%202.40.40%20AM.jpeg?raw=true)
